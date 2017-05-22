@@ -27,4 +27,5 @@ def index(path):
 
 if __name__ == '__main__':
     http_server = WSGIServer(('', 5000), app)
+    app.logger.error('RUNNING')
     http_server.serve_forever()
