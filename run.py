@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from gevent.wsgi import WSGIServer
 import pprint
 
@@ -20,7 +20,7 @@ def index(path):
         content_type = request.content_type,
     )
     app.logger.error('\n' + pprint.pformat(data))
-    return "Ok!"
+    return jsonify(data)
 
 if __name__ == '__main__':
     http_server = WSGIServer(('', 5000), app)
