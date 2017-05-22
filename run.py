@@ -6,6 +6,9 @@ app = Flask(__name__)
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 
+def get_file_args(files):
+    return [(f[0], f[1].filename) for f in files]
+
 @app.route('/', defaults={'path': ''}, methods=ALL_METHODS)
 @app.route('/<path:path>', methods=ALL_METHODS)
 def index(path):
@@ -15,7 +18,7 @@ def index(path):
         headers = list(request.headers.items()),
         form = list(request.form.items()),
         args = list(request.args.items()),
-        files = list(request.files.items()),
+        files = list(get_file_args(request.files.items())),
         json = request.json,
         content_type = request.content_type,
     )
