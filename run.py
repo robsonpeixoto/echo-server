@@ -3,6 +3,7 @@ from gevent.wsgi import WSGIServer
 import pprint
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 
@@ -22,10 +23,11 @@ def index(path):
         json = request.json,
         content_type = request.content_type,
     )
-    app.logger.error('\n' + pprint.pformat(data))
+    app.logger.info('\n' + pprint.pformat(data))
     return jsonify(data)
 
 if __name__ == '__main__':
     http_server = WSGIServer(('', 5000), app)
-    app.logger.error('RUNNING')
+    app.logger.info('RUNNING')
     http_server.serve_forever()
+
