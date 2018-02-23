@@ -18,9 +18,14 @@ def index(path):
         headers=list(request.headers.items()),
         form=list(request.form.items()),
         args=list(request.args.items()),
+        remote=dict(
+            address=request.environ['REMOTE_ADDR'],
+            port=request.environ['REMOTE_PORT'],
+        ),
+        content_type=request.content_type,
         files=[(f[0], f[1].filename) for f in request.files.items()],
         json=request.json,
-        content_type=request.content_type, )
+    )
     app.logger.info('\n' + pprint.pformat(data))
     return jsonify(data)
 
