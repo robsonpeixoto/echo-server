@@ -1,7 +1,6 @@
 import pprint
 
 from flask import Flask, jsonify, request
-from gevent.wsgi import WSGIServer
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -31,7 +30,4 @@ def index(path):
 
 
 if __name__ == '__main__':
-    port = 5000
-    http_server = WSGIServer(('', port), app)
-    app.logger.info('RUNNING on port', port)
-    http_server.serve_forever()
+    app.run(host='0.0.0.0', port=5000, debug=True)
