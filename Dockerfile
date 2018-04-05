@@ -6,6 +6,5 @@ RUN apk add --no-cache --virtual .build-dependencies gcc musl-dev && \
 
 WORKDIR /usr/src/app
 ADD run.py .
-EXPOSE 5000 5001
 
-ENTRYPOINT ["gunicorn", "-k", "gevent", "-b", "0.0.0.0:5000", "-b", "[::]:5001", "run:app"]
+ENTRYPOINT ["./init.sh"]
