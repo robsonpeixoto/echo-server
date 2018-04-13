@@ -5,6 +5,7 @@ RUN apk add --no-cache --virtual .build-dependencies gcc musl-dev && \
     apk del .build-dependencies
 
 WORKDIR /usr/src/app
-ADD run.py .
+COPY run.py .
+COPY init.sh .
 
 ENTRYPOINT ["./init.sh"]
