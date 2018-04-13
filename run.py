@@ -11,20 +11,20 @@ ALL_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 @app.route('/', defaults={'path': ''}, methods=ALL_METHODS)
 @app.route('/<path:path>', methods=ALL_METHODS)
 def index(path):
-    data = dict(
-        path=request.path,
-        method=request.method,
-        headers=list(request.headers.items()),
-        form=list(request.form.items()),
-        args=list(request.args.items()),
-        remote=dict(
-            address=request.environ['REMOTE_ADDR'],
-            port=request.environ['REMOTE_PORT'],
-        ),
-        content_type=request.content_type,
-        files=[(f[0], f[1].filename) for f in request.files.items()],
-        json=request.json,
-    )
+    data = {
+        'path': request.path,
+        'method': request.method,
+        'headers': list(request.headers.items()),
+        'form': list(request.form.items()),
+        'args': list(request.args.items()),
+        'remote': {
+            'address': request.environ['REMOTE_ADDR'],
+            'port': request.environ['REMOTE_PORT'],
+        },
+        'content_type': request.content_type,
+        'files': [(f[0], f[1].filename) for f in request.files.items()],
+        'json': request.json,
+    }
     app.logger.info('\n' + pprint.pformat(data))
     return jsonify(data)
 
