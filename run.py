@@ -4,7 +4,8 @@ import pprint
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-app.config['DEBUG'] = True
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+
 app_name = os.getenv('APP_NAME')
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']
