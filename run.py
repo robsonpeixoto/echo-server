@@ -24,14 +24,14 @@ def index(path):
             'address': request.environ['REMOTE_ADDR'],
             'port': request.environ['REMOTE_PORT'],
         },
-        'content_type': request.content_type,
+        'content-type': request.content_type,
         'files': [(f[0], f[1].filename) for f in request.files.items()],
         'json': request.json,
         'raw-data': str(request.data)
     }
 
     if app_name:
-        data['APP_NAME'] = app_name
+        data['APP-NAME'] = app_name
     app.logger.info('\n' + pprint.pformat(data))
     return jsonify(data)
 
