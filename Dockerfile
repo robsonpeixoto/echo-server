@@ -1,10 +1,12 @@
 FROM python:3-alpine
 
+WORKDIR /usr/src/app
+COPY requirements.txt .
+
 RUN apk add --no-cache --virtual .build-dependencies gcc musl-dev && \
-    pip install --no-cache-dir Flask==1.0.2 gunicorn==19.9.0 gevent==1.3.4 && \
+    pip install --no-cache-dir -r requirements.txt && \
     apk del .build-dependencies
 
-WORKDIR /usr/src/app
 COPY run.py .
 COPY init.sh .
 
