@@ -1,9 +1,11 @@
+import os
 import pprint
 
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app_name = os.getenv('APP_NAME')
 
 ALL_METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 
@@ -25,6 +27,9 @@ def index(path):
         'files': [(f[0], f[1].filename) for f in request.files.items()],
         'json': request.json,
     }
+
+    if app_name:
+        data['APP_NAME'] = app_name
     app.logger.info('\n' + pprint.pformat(data))
     return jsonify(data)
 
