@@ -6,5 +6,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY run.py .
+COPY init.sh .
 
-ENTRYPOINT ["waitress-serve", "--port=5000", "run:app"]
+ENTRYPOINT ["./init.sh"]
