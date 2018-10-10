@@ -3,11 +3,8 @@ FROM python:3-alpine
 WORKDIR /usr/src/app
 COPY requirements.txt .
 
-RUN apk add --no-cache --virtual .build-dependencies gcc musl-dev && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apk del .build-dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY run.py .
-COPY init.sh .
 
-ENTRYPOINT ["./init.sh"]
+ENTRYPOINT ["waitress-serve", "--port=5000", "run:app"]
