@@ -31,7 +31,7 @@ app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
 APP_NAME = config("APP_NAME")
 SHOW_ENVS = config("SHOW_ENVS", default=False, cast=bool)
-VERSION = '1.0.0'
+VERSION = '2.0.0'
 
 
 ALL_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]
