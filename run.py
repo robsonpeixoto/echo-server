@@ -2,6 +2,7 @@ import os
 import pprint
 from logging.config import dictConfig
 
+from decouple import config
 from flask import Flask, jsonify, request
 
 
@@ -28,7 +29,9 @@ dictConfig(
 app = Flask(__name__)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
-app_name = os.getenv("APP_NAME")
+APP_NAME = config("APP_NAME")
+SHOW_ENVS = config("SHOW_ENVS", default=False, cast=bool)
+
 
 ALL_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]
 
@@ -52,8 +55,13 @@ def index(path):
         "raw-data": str(request.data),
     }
 
-    if app_name:
-        data["APP-NAME"] = app_name
+    if APP_NAME or SHOW_ENVS:
+        data["extras"] = {}
+
+        if APP_NAME:
+            data["extras"]["app_name"] = APP_NAME
+        if SHOW_ENVS:
+            data["extras"]["envs"] = dict(os.environ)
     app.logger.info("\n" + pprint.pformat(data))
     return jsonify(data)
 
