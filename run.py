@@ -31,7 +31,7 @@ app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
 APP_NAME = config("APP_NAME")
 SHOW_ENVS = config("SHOW_ENVS", default=False, cast=bool)
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 
 
 ALL_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]
@@ -56,13 +56,11 @@ def index(path):
         "raw-data": str(request.data),
     }
 
-    if APP_NAME or SHOW_ENVS:
-        data["extras"] = { "version": VERSION }
-
-        if APP_NAME:
-            data["extras"]["app_name"] = APP_NAME
-        if SHOW_ENVS:
-            data["extras"]["envs"] = dict(os.environ)
+    data["extras"] = { "version": VERSION }
+    if APP_NAME:
+        data["extras"]["app_name"] = APP_NAME
+    if SHOW_ENVS:
+        data["extras"]["envs"] = dict(os.environ)
     app.logger.info("\n" + pprint.pformat(data))
     return jsonify(data)
 
