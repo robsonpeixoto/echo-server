@@ -29,9 +29,9 @@ dictConfig(
 app = Flask(__name__)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
 
-APP_NAME = config("APP_NAME")
+APP_NAME = config("APP_NAME", "UNKNOWN-APP-NAME")
 SHOW_ENVS = config("SHOW_ENVS", default=False, cast=bool)
-VERSION = '2.0.2'
+VERSION = '2.0.3'
 
 
 ALL_METHODS = ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]
