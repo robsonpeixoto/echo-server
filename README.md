@@ -10,94 +10,52 @@ In other terminal execute the command:
 
 ```sh
 ❯ http localhost:5000
+
 HTTP/1.1 200 OK
-Content-Length: 992
+Content-Length: 428
 Content-Type: application/json
-Date: Fri, 05 Jul 2019 00:25:32 GMT
-Server: waitress
+Date: Wed, 09 Aug 2023 10:42:10 GMT
 
 {
-    "args": [],
-    "content-type": null,
     "extras": {
         "app_name": "robinho",
         "envs": {
             "APP_NAME": "robinho",
-            "GPG_KEY": "0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D",
             "HOME": "/root",
-            "HOSTNAME": "0a9e466aaccc",
-            "LANG": "C.UTF-8",
-            "PATH": "/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "HOSTNAME": "b8abc5c78e4f",
+            "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
             "PORT": "5000",
-            "PWD": "/usr/src/app",
-            "PYTHON_PIP_VERSION": "19.1.1",
-            "PYTHON_VERSION": "3.7.3",
             "SHOW_ENVS": "1"
         }
     },
-    "files": [],
-    "form": [],
-    "headers": [
-        [
-            "Host",
-            "localhost:5000"
-        ],
-        [
-            "User-Agent",
-            "HTTPie/1.0.2"
-        ],
-        [
-            "Accept-Encoding",
-            "gzip, deflate"
-        ],
-        [
-            "Accept",
+    "form": null,
+    "headers": {
+        "Accept": [
             "*/*"
         ],
-        [
-            "Connection",
+        "Accept-Encoding": [
+            "gzip, deflate"
+        ],
+        "Connection": [
             "keep-alive"
+        ],
+        "User-Agent": [
+            "HTTPie/3.2.2"
         ]
-    ],
-    "json": null,
+    },
     "method": "GET",
     "path": "/",
-    "raw-data": "b''",
+    "query": {},
     "remote": {
-        "address": "172.17.0.1",
-        "port": "36610"
+        "address": "192.168.215.1",
+        "port": "51628"
     }
 }
+
 ```
 
 Will show the log:
 
 ```
-[2019-07-05 00:25:32,018] INFO in run:
-{'args': [],
- 'content-type': None,
- 'extras': {'app_name': 'robinho',
-            'envs': {'APP_NAME': 'robinho',
-                     'GPG_KEY': '0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D',
-                     'HOME': '/root',
-                     'HOSTNAME': '0a9e466aaccc',
-                     'LANG': 'C.UTF-8',
-                     'PATH': '/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-                     'PORT': '5000',
-                     'PWD': '/usr/src/app',
-                     'PYTHON_PIP_VERSION': '19.1.1',
-                     'PYTHON_VERSION': '3.7.3',
-                     'SHOW_ENVS': '1'}},
- 'files': [],
- 'form': [],
- 'headers': [('Host', 'localhost:5000'),
-             ('User-Agent', 'HTTPie/1.0.2'),
-             ('Accept-Encoding', 'gzip, deflate'),
-             ('Accept', '*/*'),
-             ('Connection', 'keep-alive')],
- 'json': None,
- 'method': 'GET',
- 'path': '/',
- 'raw-data': "b''",
- 'remote': {'address': '172.17.0.1', 'port': '36610'}}
+{"time":"2023-08-09T10:42:10.000541568Z","level":"INFO","msg":"","response":{"headers":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate"],"Connection":["keep-alive"],"User-Agent":["HTTPie/3.2.2"]},"form":null,"query":{},"remote":{"address":"192.168.215.1","port":"51628"},"path":"/","method":"GET","extras":{"envs":{"APP_NAME":"robinho","HOME":"/root","HOSTNAME":"b8abc5c78e4f","PATH":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin","PORT":"5000","SHOW_ENVS":"1"},"app_name":"robinho"}}}
 ```
