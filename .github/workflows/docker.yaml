@@ -1,11 +1,15 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - "main"
       - "master"
+    tags:
+      - "v*"
   pull_request:
+    branches:
+      - "master"
 
 jobs:
   docker:
