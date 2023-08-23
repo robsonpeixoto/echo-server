@@ -117,7 +117,8 @@ func main() {
 	go func() {
 		<-sig
 
-		shutdownCtx, _ := context.WithTimeout(serverCtx, 30*time.Second)
+		shutdownCtx, shutdownCtxCancel := context.WithTimeout(serverCtx, 30*time.Second)
+		defer shutdownCtxCancel()
 
 		go func() {
 			<-shutdownCtx.Done()
