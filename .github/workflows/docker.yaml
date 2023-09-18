@@ -33,7 +33,7 @@ jobs:
           version: latest
       - name: Docker metadata-action
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: robsonpeixoto/echo-server
       - name: Set up Docker Buildx
