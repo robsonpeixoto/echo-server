@@ -11,10 +11,6 @@ on:
     branches:
       - "master"
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -53,8 +49,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - uses: google-github-actions/release-please-action@v3
-        if: ${{ github.ref == 'refs/heads/master' }}
-        with:
-          release-type: go
-          package-name: github.com/robsonpeixoto/echo-server
