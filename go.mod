@@ -1,3 +1,3 @@
 module github.com/robsonpeixoto/echo-server
 
-go 1.21
+go 1.21.1

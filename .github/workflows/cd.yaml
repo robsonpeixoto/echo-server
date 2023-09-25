@@ -66,4 +66,3 @@ jobs:
         with:
           release-type: go
           package-name: github.com/robsonpeixoto/echo-server
-
