@@ -12,6 +12,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	_ "go.uber.org/automaxprocs"
 )
 
 type RemoteAddress struct {
