@@ -6,6 +6,6 @@ COPY . .
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 RUN --mount=type=cache,target=/root/.cache/go-build go build -o  /usr/local/bin/app ./...
 
-FROM alpine:3.18
+FROM alpine:3.19
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
 CMD ["app"]
