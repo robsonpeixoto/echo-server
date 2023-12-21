@@ -96,7 +96,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	maxprocs.Set(maxprocs.Logger(log.Printf))
+	_, _ = maxprocs.Set(maxprocs.Logger(log.Printf))
 
 	extras := Extras{
 		AppName: os.Getenv("APP_NAME"),
