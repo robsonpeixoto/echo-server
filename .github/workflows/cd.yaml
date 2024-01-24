@@ -16,7 +16,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  golangci:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,14 +26,14 @@ jobs:
           check-latest: true
           go-version-file: go.mod
           cache-dependency-path: go.sum
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+      - run: "go vet ./..."
+      - run: go run  golang.org/x/vuln/cmd/govulncheck@latest ./...
+      - uses: dominikh/staticcheck-action@v1
         with:
-          version: latest
-          only-new-issues: true
+          install-go: false
   docker:
     runs-on: ubuntu-latest
-    needs: [ golangci ]
+    needs: [lint]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
