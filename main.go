@@ -116,7 +116,12 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", echo(extras))
 
-	server := &http.Server{Addr: "0.0.0.0:5000", Handler: mux}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+
+	server := &http.Server{Addr: "0.0.0.0:" + port, Handler: mux}
 	serverCtx, serverStopCtx := context.WithCancel(context.Background())
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
