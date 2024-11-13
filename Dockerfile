@@ -6,13 +6,13 @@ ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod \
-  --mount=type=bind,source=go.mod,target=go.mod \
-  --mount=type=bind,source=go.sum,target=go.sum \
-  go mod download -x
+    --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    go mod download -x
 
 RUN --mount=type=cache,target=/go/pkg/mod \
-  --mount=type=bind,target=. \
-  GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /usr/local/bin/app .
+    --mount=type=bind,target=. \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /usr/local/bin/app .
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION}
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
