@@ -34,7 +34,7 @@ type Response struct {
 	Path        string              `json:"path"`
 	Method      string              `json:"method"`
 	ContentType string              `json:"content-type,omitempty"`
-	Extras      Extras              `json:"extras,omitempty"`
+	Extras      Extras              `json:"extras"`
 	Json        json.RawMessage     `json:"json,omitempty"`
 }
 
