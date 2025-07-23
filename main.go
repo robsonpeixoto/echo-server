@@ -55,7 +55,11 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 		var jsonBody json.RawMessage = []byte("")
 
 		if r.Body != nil {
-			defer r.Body.Close()
+			defer func() {
+				if err := r.Body.Close(); err != nil {
+					slog.Error("failed to close request body", "error", err)
+				}
+			}()
 			if strings.Contains(contentType, "application/json") {
 				body, err := io.ReadAll(r.Body)
 				if err != nil {
