@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -125,7 +126,7 @@ func main() {
 		port = "5000"
 	}
 
-	server := &http.Server{Addr: "0.0.0.0:" + port, Handler: mux}
+	server := &http.Server{Addr: net.JoinHostPort("0.0.0.0", port), Handler: mux}
 	serverCtx, serverStopCtx := context.WithCancel(context.Background())
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
