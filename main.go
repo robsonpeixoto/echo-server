@@ -35,7 +35,7 @@ type Response struct {
 	Method      string              `json:"method"`
 	ContentType string              `json:"content-type,omitempty"`
 	Extras      Extras              `json:"extras"`
-	Json        json.RawMessage     `json:"json,omitempty"`
+	JSON        json.RawMessage     `json:"json,omitempty"`
 }
 
 func parseRemoteAddr(remoteAddress string) RemoteAddress {
@@ -73,7 +73,7 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 			Query:       r.URL.Query(),
 			Remote:      parseRemoteAddr(r.RemoteAddr),
 			ContentType: r.Header.Get("Content-Type"),
-			Json:        jsonBody,
+			JSON:        jsonBody,
 			Extras:      extras,
 		}
 
