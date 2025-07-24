@@ -28,6 +28,7 @@ type Extras struct {
 }
 
 type Response struct {
+	Host        string              `json:"host"`
 	Headers     map[string][]string `json:"headers"`
 	Form        map[string][]string `json:"form"`
 	Query       map[string][]string `json:"query"`
@@ -70,7 +71,9 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 				jsonBody = json.RawMessage(body)
 			}
 		}
+
 		response := Response{
+			Host:        r.Host,
 			Path:        r.URL.Path,
 			Method:      r.Method,
 			Headers:     r.Header,
