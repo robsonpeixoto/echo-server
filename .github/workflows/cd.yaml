@@ -77,7 +77,6 @@ jobs:
           aws-region: us-east-1
           role-to-assume: ${{ secrets.AWS_GITHUB_ROLE }}
           output-credentials: true
-          output-env-credentials: true
       - name: Login to Public AWS ECR
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -85,6 +84,8 @@ jobs:
           registry: public.ecr.aws
           username: ${{ steps.aws.outputs.aws-access-key-id }}
           password: ${{ steps.aws.outputs.aws-secret-access-key }}
+        env:
+          AWS_REGION: us-east-1
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
