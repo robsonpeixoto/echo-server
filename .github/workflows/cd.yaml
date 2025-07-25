@@ -33,6 +33,8 @@ jobs:
           install-go: false
   docker:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     needs: [lint]
     steps:
       - name: Checkout
