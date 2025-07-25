@@ -28,16 +28,18 @@ type Extras struct {
 }
 
 type Response struct {
-	Host        string              `json:"host"`
-	Headers     map[string][]string `json:"headers"`
-	Form        map[string][]string `json:"form"`
-	Query       map[string][]string `json:"query"`
-	Remote      RemoteAddress       `json:"remote"`
-	Path        string              `json:"path"`
-	Method      string              `json:"method"`
-	ContentType string              `json:"content-type,omitempty"`
-	Extras      Extras              `json:"extras"`
-	JSON        json.RawMessage     `json:"json,omitempty"`
+	Host          string              `json:"host"`
+	Proto         string              `json:"proto"`
+	ContentLength int64               `json:"content_length"`
+	Headers       map[string][]string `json:"headers"`
+	Form          map[string][]string `json:"form"`
+	Query         map[string][]string `json:"query"`
+	Remote        RemoteAddress       `json:"remote"`
+	Path          string              `json:"path"`
+	Method        string              `json:"method"`
+	ContentType   string              `json:"content-type,omitempty"`
+	Extras        Extras              `json:"extras"`
+	JSON          json.RawMessage     `json:"json,omitempty"`
 }
 
 func parseRemoteAddr(remoteAddress string) RemoteAddress {
@@ -73,16 +75,18 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		response := Response{
-			Host:        r.Host,
-			Path:        r.URL.Path,
-			Method:      r.Method,
-			Headers:     r.Header,
-			Form:        r.Form,
-			Query:       r.URL.Query(),
-			Remote:      parseRemoteAddr(r.RemoteAddr),
-			ContentType: r.Header.Get("Content-Type"),
-			JSON:        jsonBody,
-			Extras:      extras,
+			Host:          r.Host,
+			Proto:         r.Proto,
+			ContentLength: r.ContentLength,
+			Path:          r.URL.Path,
+			Method:        r.Method,
+			Headers:       r.Header,
+			Form:          r.Form,
+			Query:         r.URL.Query(),
+			Remote:        parseRemoteAddr(r.RemoteAddr),
+			ContentType:   r.Header.Get("Content-Type"),
+			JSON:          jsonBody,
+			Extras:        extras,
 		}
 
 		bytes, err := json.Marshal(response)
