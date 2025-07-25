@@ -1,5 +1,15 @@
 # echo-server
 
+Just a simple http application to test and debug HTTP requests.
+
+## Docker Registries
+
+- [Docker Hub](https://hub.docker.com/r/robsonpeixoto/echo-server)
+- [AWS ECR Public](https://gallery.ecr.aws/v2m3p9l8/robsonpeixoto/echo-server)
+- [Github Docker Registry](https://github.com/robsonpeixoto/echo-server/pkgs/container/echo-server)
+
+## Usage
+
 ```sh
 ❯ docker run --rm -p 5000:5000 -e PORT=5000 -e APP_NAME=robinho -e SHOW_ENVS=1 robsonpeixoto/echo-server
 ```
