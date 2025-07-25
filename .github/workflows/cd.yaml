@@ -50,37 +50,46 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: robsonpeixoto/echo-server
-      # Docker HUB
+          images: |
+            robsonpeixoto/echo-server
+            public.ecr.aws/v2m3p9l8/robsonpeixoto/echo-server
+            ghcr.io/${{ github.repository }}
       - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push to Docker Hub
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: ${{ steps.qemu.outputs.platforms }}
-      # GitHub Container Registry
       - name: Login to GitHub Container Registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push to GitHub Container Registry
+      - name: Configure AWS credentials
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        id: aws
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ROLE }}
+          aws-region: aws-region-1
+          output-credentials: true
+      - name: Login to Public AWS ECR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: public.ecr.aws
+          username: ${{ steps.aws.outputs.aws-access-key-id }}
+          password: ${{ steps.aws.outputs.aws-secret-access-key }}
+        env:
+          AWS_REGION: us-east-1
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
