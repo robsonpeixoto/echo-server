@@ -35,6 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      id-token: write
+      contents: read
     needs: [lint]
     steps:
       - name: Checkout
