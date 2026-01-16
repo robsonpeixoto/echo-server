@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"log/slog"
@@ -14,6 +15,13 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/contrib/exporters/autoexport"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	sdklog "go.opentelemetry.io/otel/sdk/log"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/automaxprocs/maxprocs"
 )
 
@@ -40,6 +48,74 @@ type Response struct {
 	ContentType   string              `json:"content-type,omitempty"`
 	Extras        Extras              `json:"extras"`
 	JSON          json.RawMessage     `json:"json,omitempty"`
+}
+
+// setupOTelSDK configures the OpenTelemetry SDK with autoexport.
+// It reads configuration from environment variables:
+//   - OTEL_TRACES_EXPORTER: otlp (default), console, none
+//   - OTEL_METRICS_EXPORTER: otlp (default), console, none
+//   - OTEL_LOGS_EXPORTER: otlp (default), console, none
+//   - OTEL_EXPORTER_OTLP_ENDPOINT: collector endpoint (e.g., http://localhost:4318)
+//   - OTEL_EXPORTER_OTLP_PROTOCOL: grpc (default), http/protobuf
+//   - OTEL_SERVICE_NAME: service name for telemetry data
+func setupOTelSDK(ctx context.Context) (shutdown func(context.Context) error, err error) {
+	var shutdownFuncs []func(context.Context) error
+
+	shutdown = func(ctx context.Context) error {
+		var err error
+		for _, fn := range shutdownFuncs {
+			err = errors.Join(err, fn(ctx))
+		}
+		return err
+	}
+
+	handleErr := func(inErr error) {
+		err = errors.Join(inErr, shutdown(ctx))
+	}
+
+	// Set up propagator for context propagation across services
+	prop := propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+	)
+	otel.SetTextMapPropagator(prop)
+
+	// Set up TracerProvider with autoexport
+	spanExporter, err := autoexport.NewSpanExporter(ctx)
+	if err != nil {
+		handleErr(err)
+		return
+	}
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(spanExporter),
+	)
+	shutdownFuncs = append(shutdownFuncs, tracerProvider.Shutdown)
+	otel.SetTracerProvider(tracerProvider)
+
+	// Set up MeterProvider with autoexport
+	metricReader, err := autoexport.NewMetricReader(ctx)
+	if err != nil {
+		handleErr(err)
+		return
+	}
+	meterProvider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(metricReader),
+	)
+	shutdownFuncs = append(shutdownFuncs, meterProvider.Shutdown)
+	otel.SetMeterProvider(meterProvider)
+
+	// Set up LoggerProvider with autoexport
+	logExporter, err := autoexport.NewLogExporter(ctx)
+	if err != nil {
+		handleErr(err)
+		return
+	}
+	loggerProvider := sdklog.NewLoggerProvider(
+		sdklog.WithProcessor(sdklog.NewBatchProcessor(logExporter)),
+	)
+	shutdownFuncs = append(shutdownFuncs, loggerProvider.Shutdown)
+
+	return shutdown, nil
 }
 
 func parseRemoteAddr(remoteAddress string) RemoteAddress {
@@ -110,6 +186,13 @@ func main() {
 
 	_, _ = maxprocs.Set(maxprocs.Logger(log.Printf))
 
+	// Set up OpenTelemetry SDK
+	ctx := context.Background()
+	otelShutdown, err := setupOTelSDK(ctx)
+	if err != nil {
+		slog.Error("failed to initialize OpenTelemetry", "error", err)
+	}
+
 	extras := Extras{
 		AppName: os.Getenv("APP_NAME"),
 	}
@@ -128,12 +211,15 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", echo(extras))
 
+	// Wrap the mux with OpenTelemetry HTTP instrumentation
+	otelHandler := otelhttp.NewHandler(mux, "echo-server")
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
 	}
 
-	server := &http.Server{Addr: net.JoinHostPort("0.0.0.0", port), Handler: mux}
+	server := &http.Server{Addr: net.JoinHostPort("0.0.0.0", port), Handler: otelHandler}
 	serverCtx, serverStopCtx := context.WithCancel(context.Background())
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -150,15 +236,20 @@ func main() {
 			}
 		}()
 
-		err := server.Shutdown(shutdownCtx)
-		if err != nil {
+		// Shutdown OpenTelemetry SDK
+		if otelShutdown != nil {
+			if err := otelShutdown(shutdownCtx); err != nil {
+				slog.Error("failed to shutdown OpenTelemetry", "error", err)
+			}
+		}
+
+		if err := server.Shutdown(shutdownCtx); err != nil {
 			log.Fatal(err)
 		}
 		serverStopCtx()
 	}()
 
-	err := server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 
