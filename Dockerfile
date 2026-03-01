@@ -12,7 +12,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,target=. \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /usr/local/bin/app .
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /usr/local/bin/app ./cmd/echo
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION}
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
