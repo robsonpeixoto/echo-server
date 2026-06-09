@@ -13,8 +13,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"go.uber.org/automaxprocs/maxprocs"
 )
 
 type RemoteAddress struct {
@@ -107,8 +105,6 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
-
-	_, _ = maxprocs.Set(maxprocs.Logger(log.Printf))
 
 	extras := Extras{
 		AppName: os.Getenv("APP_NAME"),
