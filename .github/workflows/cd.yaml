@@ -59,8 +59,6 @@ jobs:
             robsonpeixoto/echo-server
             public.ecr.aws/v2m3p9l8/robsonpeixoto/echo-server
             ghcr.io/${{ github.repository }}
-          flavor: |
-            suffix=-${{ matrix.suffix }},onlatest=true
       - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
