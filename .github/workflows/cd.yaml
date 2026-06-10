@@ -28,9 +28,7 @@ jobs:
           cache-dependency-path: go.sum
       - run: "go vet ./..."
       - run: go run  golang.org/x/vuln/cmd/govulncheck@latest ./...
-      - uses: dominikh/staticcheck-action@9716614d4101e79b4340dd97b10e54d68234e431 # v1.4.1
-        with:
-          install-go: false
+      - uses: golangci/golangci-lint-action@82606bf257cbaff209d206a39f5134f0cfbfd2ee # v9.2.1
   docker:
     runs-on: ${{ matrix.runner }}
     permissions:
