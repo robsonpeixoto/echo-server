@@ -4,6 +4,8 @@ ARG ALPINE_VERSION=3.23
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS builder
 ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION=dev
+ARG COMMIT=none
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,source=go.mod,target=go.mod \
@@ -12,7 +14,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,target=. \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /usr/local/bin/app .
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+    -ldflags "-X main.version=${VERSION} -X main.commit=${COMMIT}" \
+    -o /usr/local/bin/app .
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION}
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
+	"fmt"
 	"io"
 	"log"
 	"log/slog"
@@ -10,10 +12,28 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime/debug"
 	"strings"
 	"syscall"
 	"time"
 )
+
+var (
+	version = "dev"
+	commit  = "none"
+)
+
+func buildInfo() (string, string) {
+	v, c := version, commit
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, s := range info.Settings {
+			if s.Key == "vcs.revision" && c == "none" {
+				c = s.Value
+			}
+		}
+	}
+	return v, c
+}
 
 type RemoteAddress struct {
 	Address string `json:"address"`
@@ -103,7 +123,16 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	showVersion := flag.Bool("version", false, "print version and exit")
+	flag.Parse()
+
+	v, c := buildInfo()
+	if *showVersion {
+		fmt.Printf("echo-server %s (%s)\n", v, c)
+		return
+	}
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("version", v, "commit", c)
 	slog.SetDefault(logger)
 
 	extras := Extras{
