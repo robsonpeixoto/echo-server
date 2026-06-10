@@ -18,6 +18,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     -ldflags "-X main.version=${VERSION} -X main.commit=${COMMIT}" \
     -o /usr/local/bin/app .
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION}
+FROM alpine:${ALPINE_VERSION}
 COPY --from=builder /usr/local/bin/app /usr/local/bin/app
 CMD ["/usr/local/bin/app"]
