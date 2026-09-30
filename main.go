@@ -75,7 +75,7 @@ func parseRemoteAddr(remoteAddress string) RemoteAddress {
 func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contentType := r.Header.Get("Content-Type")
-		var jsonBody jsontext.Value = []byte("")
+		var jsonBody jsontext.Value
 
 		if r.Body != nil {
 			defer func() {
@@ -89,7 +89,13 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				jsonBody = jsontext.Value(body)
+				if len(body) > 0 {
+					jsonBody = jsontext.Value(body)
+					if !jsonBody.IsValid() {
+						w.WriteHeader(http.StatusBadRequest)
+						return
+					}
+				}
 			}
 		}
 
