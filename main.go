@@ -83,6 +83,10 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 					slog.Error("failed to close request body", "error", err)
 				}
 			}()
+			if err := r.ParseForm(); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 			if strings.Contains(contentType, "application/json") {
 				body, err := io.ReadAll(r.Body)
 				if err != nil {
@@ -106,7 +110,7 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 			Path:          r.URL.Path,
 			Method:        r.Method,
 			Headers:       r.Header,
-			Form:          r.Form,
+			Form:          r.PostForm,
 			Query:         r.URL.Query(),
 			Remote:        parseRemoteAddr(r.RemoteAddr),
 			ContentType:   r.Header.Get("Content-Type"),
