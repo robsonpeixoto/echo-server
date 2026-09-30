@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"flag"
 	"fmt"
 	"io"
@@ -57,7 +58,7 @@ type Response struct {
 	Method        string              `json:"method"`
 	ContentType   string              `json:"content-type,omitempty"`
 	Extras        Extras              `json:"extras"`
-	JSON          json.RawMessage     `json:"json,omitempty"`
+	JSON          jsontext.Value      `json:"json,omitempty"`
 }
 
 func parseRemoteAddr(remoteAddress string) RemoteAddress {
@@ -74,7 +75,7 @@ func parseRemoteAddr(remoteAddress string) RemoteAddress {
 func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contentType := r.Header.Get("Content-Type")
-		var jsonBody json.RawMessage = []byte("")
+		var jsonBody jsontext.Value = []byte("")
 
 		if r.Body != nil {
 			defer func() {
@@ -88,7 +89,7 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				jsonBody = json.RawMessage(body)
+				jsonBody = jsontext.Value(body)
 			}
 		}
 
