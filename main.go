@@ -62,10 +62,10 @@ type Response struct {
 }
 
 func parseRemoteAddr(remoteAddress string) RemoteAddress {
-	lastIndex := strings.LastIndex(remoteAddress, ":")
-	address := remoteAddress[:lastIndex]
-	port := remoteAddress[lastIndex+1:]
-
+	address, port, err := net.SplitHostPort(remoteAddress)
+	if err != nil {
+		return RemoteAddress{Address: remoteAddress}
+	}
 	return RemoteAddress{
 		Address: address,
 		Port:    port,
