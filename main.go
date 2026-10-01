@@ -72,33 +72,26 @@ func parseRemoteAddr(remoteAddress string) RemoteAddress {
 	}
 }
 
-func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
+func echo(extras Extras) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contentType := r.Header.Get("Content-Type")
 		var jsonBody jsontext.Value
 
-		if r.Body != nil {
-			defer func() {
-				if err := r.Body.Close(); err != nil {
-					slog.Error("failed to close request body", "error", err)
-				}
-			}()
-			if err := r.ParseForm(); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+		if err := r.ParseForm(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if strings.Contains(contentType, "application/json") {
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if strings.Contains(contentType, "application/json") {
-				body, err := io.ReadAll(r.Body)
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
+			if len(body) > 0 {
+				jsonBody = jsontext.Value(body)
+				if !jsonBody.IsValid() {
+					w.WriteHeader(http.StatusBadRequest)
 					return
-				}
-				if len(body) > 0 {
-					jsonBody = jsontext.Value(body)
-					if !jsonBody.IsValid() {
-						w.WriteHeader(http.StatusBadRequest)
-						return
-					}
 				}
 			}
 		}
@@ -113,21 +106,20 @@ func echo(extras Extras) func(w http.ResponseWriter, r *http.Request) {
 			Form:          r.PostForm,
 			Query:         r.URL.Query(),
 			Remote:        parseRemoteAddr(r.RemoteAddr),
-			ContentType:   r.Header.Get("Content-Type"),
+			ContentType:   contentType,
 			JSON:          jsonBody,
 			Extras:        extras,
 		}
 
-		bytes, err := json.Marshal(response)
+		out, err := json.Marshal(response)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, err = w.Write(bytes)
-		if err != nil {
-			slog.Error(err.Error())
+		if _, err := w.Write(out); err != nil {
+			slog.Error("failed to write response", "error", err)
 		}
 		slog.Info("", "response", response)
 	}
@@ -150,13 +142,10 @@ func main() {
 		AppName: os.Getenv("APP_NAME"),
 	}
 
-	showEnvs := os.Getenv("SHOW_ENVS")
-	if showEnvs == "1" {
+	if os.Getenv("SHOW_ENVS") == "1" {
 		extras.Envs = map[string]string{}
 		for _, kv := range os.Environ() {
-			kvSlice := strings.SplitN(kv, "=", 2)
-			k := kvSlice[0]
-			v := kvSlice[1]
+			k, v, _ := strings.Cut(kv, "=")
 			extras.Envs[k] = v
 		}
 	}
